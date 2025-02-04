@@ -7,3 +7,4 @@ lxml
 newsapi-python
 gunicorn==20.1.0
 pytz==2023.3  # For timezone handling
+gevent>=1.4
