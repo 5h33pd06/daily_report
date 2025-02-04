@@ -1,0 +1,37 @@
+[
+    {
+        "name": "ThreatPost",
+        "url": "https://threatpost.com/feed/",
+	"topics": []
+    },
+    {
+        "name": "The Hacker News",
+        "url": "https://feeds.feedburner.com/TheHackersNews",
+	"topics": []
+    },
+    {
+        "name": "Krebs on Security",
+        "url": "https://krebsonsecurity.com/feed/",
+	"topics": []
+    },
+    {
+        "name": "Darknet",
+        "url": "https://www.darknet.org.uk/feed/",
+	"topics": []
+    },
+    {
+        "name": "CISA - News",
+        "url": "https://www.cisa.gov/news.xml",
+	"topics": []
+    },
+    {
+        "name": "CISA - Advisories",
+        "url": "https://www.cisa.gov/cybersecurity-advisories/all.xml",
+	"topics": []
+    },
+    {
+        "name": "Darkreading",
+        "url": "https://www.darkreading.com/rss.xml",
+	"topics": []
+    }
+]

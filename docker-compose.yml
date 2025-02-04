@@ -1,0 +1,46 @@
+services:
+  web:
+    build: .
+    container_name: cybersecurity_briefing_app
+    ports:
+      - "31337:31337"
+    secrets:
+      - email_user
+      - email_password
+      - email_receiver
+      - newsapi_key
+      - secret_key
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+      - TZ=America/New_York
+      - EMAIL_USER_FILE=/run/secrets/email_user
+      - EMAIL_PASSWORD_FILE=/run/secrets/email_password
+      - EMAIL_RECEIVER_FILE=/run/secrets/email_receiver
+      - NEWSAPI_KEY_FILE=/run/secrets/newsapi_key
+      - SECRET_KEY_FILE=/run/secrets/secret_key
+    restart: always
+    volumes:
+      - ./news_sources.json:/app/news_sources.json
+      - ./secrets/email_user.secret:/run/secrets/email_user
+      - ./secrets/email_password.secret:/run/secrets/email_password
+      - ./secrets/email_receiver.secret:/run/secrets/email_receiver
+      - ./secrets/newsapi.secret:/run/secrets/newsapi_key
+      - ./secrets/secret_key.secret:/run/secrets/secret_key
+      - ./logs:/app/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+secrets:
+  email_user:
+    file: /var/www/daily_report/secrets/email_user.secret
+  email_password:
+    file: /var/www/daily_report/secrets/email_password.secret
+  email_receiver:
+    file: /var/www/daily_report/secrets/email_receiver.secret
+  newsapi_key:
+    file: /var/www/daily_report/secrets/newsapi.secret
+  secret_key:
+    file: /var/www/daily_report/secrets/secret_key.secret

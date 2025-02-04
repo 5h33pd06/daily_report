@@ -1,0 +1,9 @@
+Flask
+requests
+beautifulsoup4
+apscheduler
+python-dotenv
+lxml
+newsapi-python
+gunicorn==20.1.0
+pytz==2023.3  # For timezone handling
