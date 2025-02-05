@@ -10,12 +10,12 @@ import smtplib
 import os
 import json
 import time
+import threading
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 from collections import defaultdict
 from pytz import timezone
 from logging.handlers import RotatingFileHandler
-
 
 # Load environment variables from .env file
 load_dotenv()
@@ -467,19 +467,18 @@ def send_email_route():
     send_email()
     flash("Email sent successfully.", "success")
     return redirect(url_for("dashboard"))
-
-def schedule_email_job():
+    
+def start_scheduler():
     """Schedule the email to be sent every day at 8:00 AM in the specified timezone."""
     scheduler = BackgroundScheduler()
-    # Use a specific timezone (e.g., US/Eastern)
     scheduler.add_job(send_email, 'cron', hour=8, minute=0, timezone=timezone('US/Eastern'))
-    
-    # Start the scheduler
-    try:
-        scheduler.start()
-    except (KeyboardInterrupt, SystemExit):
-        # Gracefully shut down the scheduler on exit
-        scheduler.shutdown()
+    scheduler.start()
+    logging.info("Scheduler started.")
+
+def list_scheduled_jobs(scheduler):
+    jobs = scheduler.get_jobs()
+    for job in jobs:
+        print(f"Job: {job.id}, Next run time: {job.next_run_time}")
 
 @app.route('/stop_alerts/<int:index>', methods=['POST'])
 def stop_alerts(index):
@@ -610,5 +609,6 @@ def management_page():
                             news_sources=news_sources)
 
 if __name__ == "__main__":
-    schedule_email_job()
+    # Start scheduler in a background thread
+    threading.Thread(target=start_scheduler, daemon=True).start()
     app.run(host='0.0.0.0', port=31337)
