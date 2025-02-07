@@ -1,10 +1,11 @@
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
 import logging
 import smtplib
 import os
@@ -34,9 +35,6 @@ NEWS_SOURCES_FILE = "news_sources.json"
 NEWSAPI_URL = "https://newsapi.org/v2/everything"
 TOPICS_FILE = "topics.json"
 CACHE_FILE = "news_cache.json"
-EMAIL_USER = get_secret(os.getenv("EMAIL_USER_FILE"))
-EMAIL_PASSWORD = get_secret(os.getenv("EMAIL_PASSWORD_FILE"))
-EMAIL_RECEIVER = get_secret(os.getenv("EMAIL_RECEIVER_FILE"))
 NEWSAPI_KEY = get_secret(os.getenv("NEWSAPI_KEY_FILE"))
 app.secret_key = get_secret(os.getenv('SECRET_KEY_FILE'))  # Needed for flash messages
 app.config['DEBUG'] = False
@@ -418,68 +416,6 @@ def get_dashboard_data():
     
     return all_news
 
-def format_email_content(news_items):
-    """Format news items for email content."""
-    content = "Daily Cybersecurity Briefing\n\n"
-    for news in news_items:
-        title = news.get("title", "No Title")
-        link = news.get("link", "No Link")
-        pub_date = news.get("pub_date", "Unknown Date")
-        source = news.get("source", "Unknown Source")
-        topic = news.get("topic", "General")
-
-        content += f"- {title}\n  Source: {source}\n  Topic: {topic}\n  Published: {pub_date}\n  Link: {link}\n\n"
-
-    return content
-
-
-def send_email():
-    """Send an email containing the same data as the dashboard."""
-    news_items = get_dashboard_data()
-    content = format_email_content(news_items)
-
-    if not EMAIL_USER or not EMAIL_PASSWORD or not EMAIL_RECEIVER:
-        logging.error("Email credentials are not set.")
-        return
-
-    subject = "Daily Cybersecurity Briefing"
-    msg = MIMEMultipart()
-    msg["From"] = EMAIL_USER
-    msg["To"] = EMAIL_RECEIVER
-    msg["Subject"] = subject
-
-    # Add the email body content
-    msg.attach(MIMEText(content, "plain"))
-
-    try:
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.starttls()
-            server.login(EMAIL_USER, EMAIL_PASSWORD)
-            server.send_message(msg)
-            logging.info("Email sent successfully.")
-    except Exception as e:
-        logging.error(f"Error sending email: {str(e)}")
-
-
-@app.route("/send_email", methods=["POST"])
-def send_email_route():
-    """Manually trigger an email with the latest dashboard data."""
-    send_email()
-    flash("Email sent successfully.", "success")
-    return redirect(url_for("dashboard"))
-    
-def start_scheduler():
-    """Schedule the email to be sent every day at 8:00 AM in the specified timezone."""
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(send_email, 'cron', hour=8, minute=0, timezone=timezone('US/Eastern'))
-    scheduler.start()
-    logging.info("Scheduler started.")
-
-def list_scheduled_jobs(scheduler):
-    jobs = scheduler.get_jobs()
-    for job in jobs:
-        print(f"Job: {job.id}, Next run time: {job.next_run_time}")
-
 @app.route('/stop_alerts/<int:index>', methods=['POST'])
 def stop_alerts(index):
     news_sources = load_news_sources()
@@ -518,6 +454,12 @@ def dashboard():
                             grouped_news=grouped_news,
                             topics=topics,
                             news_sources=news_sources)
+
+@app.route('/dashboard_data')
+def dashboard_data():
+    """Return dashboard data as JSON."""
+    all_news = get_dashboard_data()
+    return jsonify(all_news)
 
 @app.route('/add_news_source', methods=['POST'])
 def add_news_source():
@@ -609,6 +551,15 @@ def management_page():
                             news_sources=news_sources)
 
 if __name__ == "__main__":
-    # Start scheduler in a background thread
-    threading.Thread(target=start_scheduler, daemon=True).start()
+    # Configure logging to show more details
+    logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()  # Keep console output
+    ]
+)
+   
+    # Run Flask app
     app.run(host='0.0.0.0', port=31337)
