@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .management-container {
+            display: flex;
+            gap: 20px;
+        }
+        .management-section {
+            flex: 1;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .item-list {
+            margin-top: 20px;
+        }
+        .item-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-links {
+            margin-bottom: 20px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #007bff;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    </div>
+
+    <h1>News Management</h1>
+
+    <div class="management-container">
+        <!-- Topics Management Section -->
+        <div class="management-section">
+            <h2>Manage Topics</h2>
+            
+            <!-- Add New Topic Form -->
+            <form action="{{ url_for('add_topic') }}" method="POST">
+                <input type="text" name="topic" placeholder="Enter new topic" required>
+                <button type="submit">Add Topic</button>
+            </form>
+
+            <!-- Current Topics List -->
+            <div class="item-list">
+                <h3>Current Topics</h3>
+                {% if topics %}
+                    <ul>
+                    {% for topic in topics %}
+                        <li>
+                            {{ topic }}
+                            <div class="item-actions">
+                                <form action="{{ url_for('delete_topic', topic=topic) }}" method="POST" style="margin: 0;">
+                                    <button type="submit" style="background-color: #dc3545;">Delete</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No topics added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- News Sources Management Section -->
+        <div class="management-section">
+            <h2>Manage News Sources</h2>
+            
+            <!-- Add New Source Form -->
+            <form action="{{ url_for('add_news_source') }}" method="POST">
+                <input type="text" name="name" placeholder="Source Name" required>
+                <input type="url" name="url" placeholder="RSS Feed URL" required>
+                <button type="submit">Add Source</button>
+            </form>
+
+            <!-- Current Sources List -->
+            <div class="item-list">
+                <h3>Current Sources</h3>
+                {% if news_sources %}
+                    <ul>
+                    {% for source in news_sources %}
+                        <li>
+                            <div>
+                                <strong>{{ source.name }}</strong><br>
+                                <small>{{ source.url }}</small>
+                            </div>
+                            <div class="item-actions">
+                                <form action="{{ url_for('delete_news_source', index=loop.index0) }}" method="POST" style="margin: 0;">
+                                    <button type="submit" style="background-color: #dc3545;">Delete</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No news sources added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</body>
+</html>

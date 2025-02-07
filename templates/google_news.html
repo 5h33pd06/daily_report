@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google News</title>
+</head>
+<body>
+    <h1>Latest Google News</h1>
+
+    {% for topic, articles in news_data.items() %}
+        <h2>{{ topic.capitalize() }} News</h2>
+        <ul>
+            {% for article in articles %}
+                <li>
+                    <a href="{{ article.link }}" target="_blank">{{ article.title }}</a>
+                    <p>{{ article.pub_date }} - Source: {{ article.source }}</p>
+                    <p>{{ article.summary }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</body>
+</html>
