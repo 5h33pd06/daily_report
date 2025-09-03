@@ -5,7 +5,7 @@ apscheduler
 python-dotenv
 lxml
 newsapi-python
-gunicorn==22.0.0
+gunicorn==23.0.0
 pytz==2023.3
 gevent>=25.4.1
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
