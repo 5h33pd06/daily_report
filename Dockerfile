@@ -1,5 +1,5 @@
 # Use an official lightweight Python image
-FROM python:3.9-slim
+FROM python:3.14.0rc2-alpine3.22
 # Set environment variables to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 # Set environment timezone to Eastern
