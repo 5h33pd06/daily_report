@@ -9,6 +9,6 @@ gunicorn==23.0.0
 pytz==2023.3
 gevent>=25.4.1
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
-setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
+setuptools>=78.1.1 # not directly required, pinned by Snyk to avoid a vulnerability
 urllib3>=2.5.0 # not directly required, pinned by Snyk to avoid a vulnerability
 werkzeug>=3.0.3 # not directly required, pinned by Snyk to avoid a vulnerability
